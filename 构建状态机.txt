@@ -1,0 +1,102 @@
+/*题目四：枚举 + 结构体——构建状态机
+任务：用枚举定义设备的所有可能状态，然后用结构体包含这个枚举字段。
+
+c
+enum DevState {
+    STATE_OFF,
+    STATE_BOOTING,
+    STATE_RUNNING,
+    STATE_ERROR,
+    STATE_UPDATE
+};
+用这个枚举改写题目二的结构体（把 int status 换成 enum DevState state），然后写一个函数，根据当前状态打印对应的中文描述。
+
+额外要求：
+写一个简单的状态转换函数，比如：
+只有 OFF 状态可以转到 BOOTING
+只有 RUNNING 状态可以转到 UPDATE
+任何状态都可以转到 ERROR
+试着在 main 里进行几次状态转换，非法的转换打印"状态转换非法"。*/
+#include <stdio.h>  
+#include <string.h>
+enum DevState {
+    STATE_OFF,    //0
+    STATE_BOOTING,//1
+    STATE_RUNNING,//2
+    STATE_ERROR,  //3
+    STATE_UPDATE  //4
+};
+struct Device {
+    int id;
+    char name[32];
+    enum DevState status;
+    int version;
+};
+void printDevice(struct Device const*const d) {
+    printf("Device ID: %d\n", d->id);
+    printf("Device Name: %s\n", d->name);
+    printf("Device Status: %d\n", d->status);
+    printf("Device Version: %d\n", d->version);
+}
+void printfstatus(struct Device const*const d){
+    printf("当前状态为:");
+    switch(d->status){
+    case STATE_OFF:printf("关机\n");
+    break;
+    case STATE_BOOTING:printf("初始化\n");
+    break;
+    case STATE_RUNNING:printf("运行中\n");
+    break;
+    case STATE_ERROR:printf("错误\n");
+    break;
+    case STATE_UPDATE:printf("升级中\n");
+    break;
+    }
+}
+void upversion(struct Device *const d){
+    int oldVersion=d->version;
+            d->version += 1;
+            int newVersion=d->version;
+            if (oldVersion<newVersion){
+            printf("升级完成\n");
+            }else printf("升级失败，请重试\n");
+}
+void state_transition(struct Device *const d,enum DevState newStatus){
+    int oldStatus =d->status;
+    switch (oldStatus){
+      case STATE_OFF:if(newStatus==STATE_BOOTING||newStatus==STATE_ERROR){
+            printf("正在跳转\n");d->status=newStatus;
+      }else printf("非法,拒绝跳转\n");
+      break;
+      case STATE_BOOTING:if(newStatus==STATE_RUNNING||newStatus==STATE_ERROR){
+            printf("正在跳转\n");d->status=newStatus;
+      }else printf("非法,拒绝跳转\n");
+      break;
+      case STATE_RUNNING:if(newStatus==STATE_UPDATE||newStatus==STATE_ERROR){
+            printf("正在跳转升级\n");d->status=newStatus;
+            upversion(d);
+      }else printf("非法,拒绝跳转\n");
+      break;
+      case STATE_ERROR:printf("程序错误，请检查报错,为保护数据已强制关机\n");
+      d->status=STATE_OFF;
+      break;
+      case STATE_UPDATE:if(newStatus==STATE_RUNNING||newStatus==STATE_ERROR){
+            printf("正在跳转\n");d->status=newStatus;
+      }else printf("非法,拒绝跳转\n");
+      break;
+    }
+}
+
+int main(){
+    struct Device devices[3];
+    devices[0] = (struct Device){1,"Device1",STATE_RUNNING,1};
+    devices[1] = (struct Device){2, "Device2", STATE_OFF, 2};
+    devices[2] = (struct Device){3, "Device3", STATE_ERROR, 3};
+    printDevice(&devices[0]);
+    printfstatus(&devices[0]);
+    state_transition(&devices[0],STATE_RUNNING);
+   printDevice(&devices[0]);
+    printfstatus(&devices[0]);
+    return 0;
+}
+完成时间：2026.8.7

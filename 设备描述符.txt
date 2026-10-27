@@ -1,0 +1,55 @@
+/*任务：定义一个结构体表示一台"安全设备"：
+struct Device {
+    int id;           // 设备ID
+    char name[32];    // 设备名
+    int status;       // 0-离线 1-在线 2-告警
+    int version;      // 固件版本号
+};
+实现以下功能：
+1.写一个函数 void printDevice(struct Device *d) 打印设备全部信息。
+2.写一个函数 void updateStatus(struct Device *d, int newStatus) 修改设备状态。
+3.在 main 里创建一个设备数组（至少 3 个），遍历打印所有"告警"状态的设备。
+要求：
+必须使用指针传递结构体（不能值传递，太大了）。
+字符串操作用 strcpy、strcmp 等。*/
+
+#include <stdio.h>
+#include <string.h>
+struct Device {
+    int id;
+    char name[32];
+    int status;
+    int version;
+};
+void printDevice(struct Device *d) ;
+void updateStatus(struct Device *d, int newStatus) ;
+int main(){
+    struct Device devices[3];
+    devices[0].id = 1;strcpy(devices[0].name, "Device1");devices[0].status = 0;devices[0].version = 1;
+    devices[1].id = 2;strcpy(devices[1].name, "Device2");devices[1].status = 1;devices[1].version = 2;
+    devices[2].id = 3;strcpy(devices[2].name, "Device3");devices[2].status = 2;devices[2].version = 3;
+
+    for (int i = 0; i < 3; i++) {
+        if (devices[i].status == 2) {
+            printDevice(&devices[i]);
+            updateStatus(&devices[i], 0); 
+             printDevice(&devices[i]);
+        }
+    }
+ 
+    return 0;
+}
+void printDevice(struct Device *d) {
+    printf("Device ID: %d\n", d->id);
+    printf("Device Name: %s\n", d->name);
+    printf("Device Status: %d\n", d->status);
+    printf("Device Version: %d\n", d->version);
+}
+void updateStatus(struct Device *d, int newStatus) {
+   if(newStatus >= 0 && newStatus <= 2) {
+       d->status = newStatus;
+   }else {
+       printf("Invalid status value. Status not updated.\n");
+   }
+}
+完成时间：2026.8.4

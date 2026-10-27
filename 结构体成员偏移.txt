@@ -1,0 +1,37 @@
+/*结构体成员偏移
+任务：定义一个包含 int、char、double 成员的结构体，然后通过指针运算找出每个成员相对于结构体首地址的偏移量。
+
+要求：
+1.不能使用 offsetof 宏，自己用指针减法算出来。
+2.把偏移量打印出来（用 %p 或 %lu）。
+3.观察 char 成员后面有没有"空洞"（内存对齐产生的 padding）*/
+
+
+
+#include <stdio.h>
+#include <stddef.h>
+struct safe_path {
+   int a;
+   char b;
+   double c;
+};
+void first_output(struct safe_path test);
+void second_output(struct safe_path test);
+int main(){
+    struct safe_path test={1,2,3};
+    printf("%d %c %f\n", test.a, test.b, test.c);
+    first_output(test);
+    second_output(test);
+    printf("sizeof(struct safe_path) = %zu\n", sizeof(test));
+    return 0;
+}
+void first_output(struct safe_path test){
+    printf("%p %p %p\n", (void*)&test.a, (void*)&test.b, (void*)&test.c);
+}
+void second_output(struct safe_path test){
+    ptrdiff_t tempa = (char*)&test.a - (char*)&test;
+    ptrdiff_t tempb = (char*)&test.b - (char*)&test;
+    ptrdiff_t tempc = (char*)&test.c - (char*)&test;
+    printf("%td %td %td\n", tempa, tempb, tempc);
+}
+完成时间：2026.8.3

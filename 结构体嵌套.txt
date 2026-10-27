@@ -1,0 +1,65 @@
+/*结构体嵌套——简单协议包解析
+任务：用结构体模拟一个简易网络数据包：
+struct Header {
+    int src_id;       // 源设备ID
+    int dst_id;       // 目标设备ID
+    int data_len;     // 数据长度
+};
+
+struct Packet {
+    struct Header hdr;
+    char payload[64]; // 载荷数据
+};
+实现以下功能：
+1.写一个函数构造一个数据包（填好头部和载荷）。
+2.写一个函数打印数据包的完整信息。
+3.写一个函数 validatePacket(struct Packet *p)，检查 data_len 是否与 strlen(payload) 一致，不一致就打印"数据长度异常，疑似被篡改"。*/
+
+#include <stdio.h>  
+#include <string.h>
+
+struct Header {
+    int src_id;       // 源设备ID
+    int dst_id;       // 目标设备ID
+    int data_len;     // 数据长度
+};
+
+struct Packet {
+    struct Header hdr;
+    char payload[64]; // 载荷数据
+};
+void constructPacket(struct Packet *p, int src, int dst, const char *data) {
+    p->hdr.src_id = src;
+    p->hdr.dst_id = dst;
+    strncpy(p->payload, data, sizeof(p->payload) - 1);
+    p->payload[sizeof(p->payload) - 1] = '\0'; // 确保字符串以'\0'结尾
+    p->hdr.data_len = strlen(p->payload);
+}
+void printPacket(struct Packet *p) {
+    printf("源设备ID: %d\n", p->hdr.src_id);
+    printf("目标设备ID: %d\n", p->hdr.dst_id);
+    printf("数据长度: %d\n", p->hdr.data_len);
+    printf("载荷数据: %s\n", p->payload);
+}
+void validatePacket(struct Packet *p) {
+    if (p->hdr.data_len != strlen(p->payload)) {
+        printf("数据长度异常，疑似被篡改\n");
+    } else {
+        printf("数据包验证通过\n");
+    }
+}
+void Test_malicious_Packet(struct Packet *p){
+    printf("如果你要测试请输入id 目标设备 数据");
+    scanf("%d %d %d", &p->hdr.src_id, &p->hdr.dst_id, &p->hdr.data_len);
+}
+int main(){
+    struct Packet p;
+    constructPacket(&p,10086,16,"Hello,im Aearone");
+    printPacket(&p);
+    validatePacket(&p);
+    Test_malicious_Packet(&p);
+    printPacket(&p);
+    validatePacket(&p);
+    return 0;
+}
+完成时间：2026.8.7
